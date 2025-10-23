@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { type Contact } from './types/contact'
 import ContactList from './components/ContactList'
 import AddContactModal from './components/AddContactModal'
@@ -7,27 +7,38 @@ import SearchBar from './components/SearchBar'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import ContactSkeleton from './components/ContactSkeleton'
+import EmptyState from './components/EmptyState'
 import './App.css'
 
-const initialContacts: Contact[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    phone: '+1 234 567 8900',
-    avatar: 'https://ui-avatars.com/api/?name=John+Doe',
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    phone: '+1 234 567 8901',
-    avatar: 'https://ui-avatars.com/api/?name=Jane+Smith',
-  },
-]
+const getStoredContacts = (): Contact[] => {
+  try {
+    const stored = localStorage.getItem('contacts')
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Error reading from localStorage:', error)
+    return []
+  }
+}
 
 function App() {
-  const [contacts, setContacts] = useState<Contact[]>(initialContacts)
+  const [isLoading, setIsLoading] = useState(true)
+  // Initialize contacts with stored data immediately
+  const [contacts, setContacts] = useState<Contact[]>(getStoredContacts())
+  
+  // Just handle loading state
+  useEffect(() => {
+    const simulateLoading = async () => {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsLoading(false)
+    }
+    simulateLoading()
+  }, [])
+
+  // Save contacts to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts))
+  }, [contacts])
   const [searchQuery, setSearchQuery] = useState('')
   const [searchBy, setSearchBy] = useState<'name' | 'email' | 'phone'>('name')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -69,8 +80,7 @@ function App() {
       if (dupName) parts.push('name')
       if (dupEmail) parts.push('email')
       if (dupPhone) parts.push('phone')
-      alert(`Cannot add contact — the following fields must be unique and already exist: ${parts.join(', ')}`)
-      return
+      throw new Error(`Cannot add contact — the following fields must be unique and already exist: ${parts.join(', ')}`)
     }
 
     const contact: Contact = {
@@ -79,7 +89,9 @@ function App() {
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newContact.name)}`,
       favorite: newContact.favorite ?? false,
     }
-    setContacts([...contacts, contact])
+    const updatedContacts = [...contacts, contact]
+    setContacts(updatedContacts)
+    localStorage.setItem('contacts', JSON.stringify(updatedContacts))
     setIsModalOpen(false)
   }
 
@@ -101,11 +113,10 @@ function App() {
       if (dupName) parts.push('name')
       if (dupEmail) parts.push('email')
       if (dupPhone) parts.push('phone')
-      alert(`Cannot update contact — the following fields must be unique and already exist: ${parts.join(', ')}`)
-      return
+      throw new Error(`Cannot update contact — the following fields must be unique and already exist: ${parts.join(', ')}`)
     }
 
-    setContacts(contacts.map(contact => 
+    const updatedContacts = contacts.map(contact => 
       contact.id === id 
         ? { 
             ...contact, 
@@ -113,7 +124,9 @@ function App() {
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(updatedContact.name)}` 
           } 
         : contact
-    ))
+    )
+    setContacts(updatedContacts)
+    localStorage.setItem('contacts', JSON.stringify(updatedContacts))
   }
 
   const handleDeleteContact = (id: string) => {
@@ -187,12 +200,35 @@ function App() {
             />
 
             <div className="mt-6">
-              <ContactList
-                contacts={filteredContacts}
-                onEdit={handleEditContact}
-                onDelete={handleDeleteContact}
-                onToggleFavorite={toggleFavorite}
-              />
+              {isLoading ? (
+                <div className="space-y-4">
+                  <ContactSkeleton />
+                  <ContactSkeleton />
+                  <ContactSkeleton />
+                </div>
+              ) : filteredContacts.length > 0 ? (
+                <ContactList
+                  contacts={filteredContacts}
+                  onEdit={handleEditContact}
+                  onDelete={handleDeleteContact}
+                  onToggleFavorite={toggleFavorite}
+                />
+              ) : searchQuery ? (
+                <EmptyState
+                  title="No results found"
+                  message={`No contacts match your search for '${searchQuery}'`}
+                />
+              ) : showFavoritesOnly ? (
+                <EmptyState
+                  title="No favorites yet"
+                  message="You haven't added any contacts to your favorites yet"
+                />
+              ) : (
+                <EmptyState
+                  title="Your contact list is empty"
+                  message="Click '+ Add Contact' to get started!"
+                />
+              )}
             </div>
           </div>
         </div>

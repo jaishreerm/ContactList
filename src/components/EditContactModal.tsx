@@ -16,11 +16,17 @@ const EditContactModal = ({ isOpen, onClose, onEdit, contact }: EditContactModal
     email: contact.email,
     phone: contact.phone,
   })
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onEdit(contact.id, formData)
-    onClose()
+    try {
+      onEdit(contact.id, formData)
+      setError(null)
+      onClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    }
   }
 
   return (
@@ -70,6 +76,11 @@ const EditContactModal = ({ isOpen, onClose, onEdit, contact }: EditContactModal
                     Edit Contact
                   </Dialog.Title>
                   <form onSubmit={handleSubmit} className="mt-6">
+                    {error && (
+                      <div className="mb-4 p-3 rounded-md bg-red-50 dark:bg-red-900/30">
+                        <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+                      </div>
+                    )}
                     <div className="space-y-4">
                       <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
