@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { type Contact } from './types/contact'
 import ContactList from './components/ContactList'
 import AddContactModal from './components/AddContactModal'
+import DeleteConfirmationModal from './components/DeleteConfirmationModal'
 import SearchBar from './components/SearchBar'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import './App.css'
 
 const initialContacts: Contact[] = [
@@ -27,13 +29,25 @@ const initialContacts: Contact[] = [
 function App() {
   const [contacts, setContacts] = useState<Contact[]>(initialContacts)
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchBy, setSearchBy] = useState<'name' | 'email' | 'phone'>('name')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const [sortOrder, setSortOrder] = useState<'az' | 'za'>('az')
+  const [deleteContact, setDeleteContact] = useState<Contact | null>(null)
 
   const filteredContacts = contacts
     .filter((contact) => (showFavoritesOnly ? contact.favorite : true))
-    .filter((contact) => contact.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((contact) => {
+      const query = searchQuery.toLowerCase()
+      switch (searchBy) {
+        case 'email':
+          return contact.email.toLowerCase().includes(query)
+        case 'phone':
+          return contact.phone.includes(query)
+        default:
+          return contact.name.toLowerCase().includes(query)
+      }
+    })
     .sort((a, b) => {
       const na = a.name.toLowerCase()
       const nb = b.name.toLowerCase()
@@ -103,8 +117,16 @@ function App() {
   }
 
   const handleDeleteContact = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this contact?')) {
-      setContacts(contacts.filter(contact => contact.id !== id))
+    const contact = contacts.find(c => c.id === id)
+    if (contact) {
+      setDeleteContact(contact)
+    }
+  }
+
+  const confirmDelete = () => {
+    if (deleteContact) {
+      setContacts(prev => prev.filter(contact => contact.id !== deleteContact.id))
+      setDeleteContact(null)
     }
   }
 
@@ -114,7 +136,21 @@ function App() {
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 sm:px-0">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h2>
+              <div className="flex items-center space-x-4">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h2>
+                <div className="relative">
+                  <select
+                    value={searchBy}
+                    onChange={(e) => setSearchBy(e.target.value as 'name' | 'email' | 'phone')}
+                    className="appearance-none rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-3 pr-8 py-1.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  >
+                    <option value="name">Search by Name</option>
+                    <option value="email">Search by Email</option>
+                    <option value="phone">Search by Phone</option>
+                  </select>
+                  <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
+                </div>
+              </div>
               <div className="flex space-x-4">
                 <ThemeToggle />
                 <div className="flex items-center space-x-2">
@@ -144,7 +180,11 @@ function App() {
               </div>
             </div>
 
-            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+            <SearchBar 
+              value={searchQuery} 
+              onChange={setSearchQuery}
+              placeholder={`Search by ${searchBy}...`}
+            />
 
             <div className="mt-6">
               <ContactList
@@ -161,6 +201,13 @@ function App() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onAdd={handleAddContact}
+        />
+
+        <DeleteConfirmationModal
+          isOpen={deleteContact !== null}
+          onClose={() => setDeleteContact(null)}
+          onConfirm={confirmDelete}
+          contact={deleteContact}
         />
       </div>
     </ThemeProvider>

@@ -3,9 +3,10 @@ import { MagnifyingGlassIcon, XCircleIcon } from '@heroicons/react/20/solid'
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
+  placeholder?: string
 }
 
-const SearchBar = ({ value, onChange }: SearchBarProps) => {
+const SearchBar = ({ value, onChange, placeholder = "Search contacts..." }: SearchBarProps) => {
   return (
     <div className="mb-6">
       <div className="relative mt-2 rounded-md shadow-sm">
@@ -16,7 +17,7 @@ const SearchBar = ({ value, onChange }: SearchBarProps) => {
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Search contacts..."
+          placeholder={placeholder}
           className="block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 dark:text-white bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm sm:leading-6 transition-colors duration-200"
         />
         {value && (
