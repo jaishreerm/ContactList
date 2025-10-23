@@ -26,30 +26,30 @@ const ContactList = ({ contacts, onEdit, onDelete }: ContactListProps) => {
             enterFrom="opacity-0 translate-y-4"
             enterTo="opacity-100 translate-y-0"
           >
-            <li className="col-span-1 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group">
+            <li className="col-span-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group dark:shadow-gray-900">
               <div className="w-full h-full p-6">
                 <div className="flex items-center space-x-4">
                   <img
-                    className="h-12 w-12 rounded-full border-2 border-indigo-100"
+                    className="h-12 w-12 rounded-full border-2 border-indigo-100 dark:border-indigo-900"
                     src={contact.avatar}
                     alt={contact.name}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {contact.name}
                       </h3>
                       <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => setEditingContact(contact)}
-                          className="text-gray-400 hover:text-indigo-600 transition-colors"
+                          className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                           title="Edit contact"
                         >
                           <PencilIcon className="h-5 w-5" />
                         </button>
                         <button
                           onClick={() => onDelete(contact.id)}
-                          className="text-gray-400 hover:text-red-600 transition-colors"
+                          className="text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                           title="Delete contact"
                         >
                           <TrashIcon className="h-5 w-5" />
@@ -59,16 +59,16 @@ const ContactList = ({ contacts, onEdit, onDelete }: ContactListProps) => {
                     <div className="mt-2 flex flex-col space-y-2">
                       <a
                         href={`mailto:${contact.email}`}
-                        className="group flex items-center text-sm text-gray-500 hover:text-indigo-600"
+                        className="group flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
-                        <EnvelopeIcon className="h-5 w-5 mr-2 text-gray-400 group-hover:text-indigo-500" />
+                        <EnvelopeIcon className="h-5 w-5 mr-2 text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400" />
                         <span className="truncate">{contact.email}</span>
                       </a>
                       <a
                         href={`tel:${contact.phone}`}
-                        className="group flex items-center text-sm text-gray-500 hover:text-indigo-600"
+                        className="group flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
-                        <PhoneIcon className="h-5 w-5 mr-2 text-gray-400 group-hover:text-indigo-500" />
+                        <PhoneIcon className="h-5 w-5 mr-2 text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400" />
                         <span>{contact.phone}</span>
                       </a>
                     </div>
