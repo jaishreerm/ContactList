@@ -1,5 +1,6 @@
 import { type Contact } from '../types/contact'
-import { EnvelopeIcon, PhoneIcon, PencilIcon, TrashIcon } from '@heroicons/react/20/solid'
+import { EnvelopeIcon, PhoneIcon, PencilIcon, TrashIcon, StarIcon as StarOutline } from '@heroicons/react/20/solid'
+import { StarIcon as StarSolid } from '@heroicons/react/24/solid'
 import { Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react'
 import EditContactModal from './EditContactModal'
@@ -8,9 +9,10 @@ interface ContactListProps {
   contacts: Contact[]
   onEdit: (id: string, contact: Omit<Contact, 'id' | 'avatar'>) => void
   onDelete: (id: string) => void
+  onToggleFavorite?: (id: string) => void
 }
 
-const ContactList = ({ contacts, onEdit, onDelete }: ContactListProps) => {
+const ContactList = ({ contacts, onEdit, onDelete, onToggleFavorite }: ContactListProps) => {
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
 
   return (
@@ -40,6 +42,13 @@ const ContactList = ({ contacts, onEdit, onDelete }: ContactListProps) => {
                         {contact.name}
                       </h3>
                       <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => onToggleFavorite?.(contact.id)}
+                          className={`transition-colors ${contact.favorite ? 'text-yellow-400' : 'text-gray-400 dark:text-gray-500 hover:text-yellow-400 dark:hover:text-yellow-300'}`}
+                          title={contact.favorite ? 'Unfavorite' : 'Add to favorites'}
+                        >
+                          {contact.favorite ? <StarSolid className="h-5 w-5" /> : <StarOutline className="h-5 w-5" />}
+                        </button>
                         <button
                           onClick={() => setEditingContact(contact)}
                           className="text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"

@@ -28,19 +28,25 @@ function App() {
   const [contacts, setContacts] = useState<Contact[]>(initialContacts)
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
 
-  const filteredContacts = contacts.filter((contact) =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredContacts = contacts
+    .filter((contact) => (showFavoritesOnly ? contact.favorite : true))
+    .filter((contact) => contact.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const handleAddContact = (newContact: Omit<Contact, 'id'>) => {
     const contact: Contact = {
       ...newContact,
       id: Math.random().toString(36).substr(2, 9),
       avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newContact.name)}`,
+      favorite: newContact.favorite ?? false,
     }
     setContacts([...contacts, contact])
     setIsModalOpen(false)
+  }
+
+  const toggleFavorite = (id: string) => {
+    setContacts((prev) => prev.map(c => c.id === id ? { ...c, favorite: !c.favorite } : c))
   }
 
   const handleEditContact = (id: string, updatedContact: Omit<Contact, 'id' | 'avatar'>) => {
@@ -71,6 +77,12 @@ function App() {
               <div className="flex space-x-4">
                 <ThemeToggle />
                 <button
+                  onClick={() => setShowFavoritesOnly(prev => !prev)}
+                  className={`px-3 py-2 rounded-md border ${showFavoritesOnly ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200'} focus:outline-none`}
+                >
+                  Favorites
+                </button>
+                <button
                   onClick={() => setIsModalOpen(true)}
                   className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                 >
@@ -86,6 +98,7 @@ function App() {
                 contacts={filteredContacts}
                 onEdit={handleEditContact}
                 onDelete={handleDeleteContact}
+                onToggleFavorite={toggleFavorite}
               />
             </div>
           </div>
