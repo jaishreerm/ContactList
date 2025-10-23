@@ -46,17 +46,33 @@ function App() {
   const [sortOrder, setSortOrder] = useState<'az' | 'za'>('az')
   const [deleteContact, setDeleteContact] = useState<Contact | null>(null)
 
+  // Helper function to normalize strings for comparison
+  const normalizeString = (str: string) => {
+    // Remove spaces, convert to lowercase
+    return str.replace(/\s+/g, '').toLowerCase()
+  }
+
+  // Helper function to normalize phone numbers
+  const normalizePhone = (phone: string) => {
+    // Remove spaces, dashes, parentheses, plus signs
+    return phone.replace(/[\s\-()+ ]/g, '')
+  }
+
   const filteredContacts = contacts
     .filter((contact) => (showFavoritesOnly ? contact.favorite : true))
     .filter((contact) => {
-      const query = searchQuery.toLowerCase()
+      if (!searchQuery) return true
+      
+      const normalizedQuery = normalizeString(searchQuery)
+      
       switch (searchBy) {
         case 'email':
-          return contact.email.toLowerCase().includes(query)
+          return normalizeString(contact.email).includes(normalizedQuery)
         case 'phone':
-          return contact.phone.includes(query)
+          // For phone, remove common separators from both query and stored number
+          return normalizePhone(contact.phone).includes(normalizePhone(searchQuery))
         default:
-          return contact.name.toLowerCase().includes(query)
+          return normalizeString(contact.name).includes(normalizedQuery)
       }
     })
     .sort((a, b) => {
