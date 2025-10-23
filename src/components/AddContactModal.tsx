@@ -13,7 +13,7 @@ const AddContactModal = ({ isOpen, onClose, onAdd }: AddContactModalProps) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    countryCode: '+91', // Default to India's country code
+    countryCode: '+91',
     phoneNumber: '',
   })
   const [error, setError] = useState<string | null>(null)
@@ -51,7 +51,6 @@ const AddContactModal = ({ isOpen, onClose, onAdd }: AddContactModalProps) => {
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
           <span className="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">
             &#8203;
           </span>

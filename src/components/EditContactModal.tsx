@@ -11,7 +11,6 @@ interface EditContactModalProps {
 }
 
 const EditContactModal = ({ isOpen, onClose, onEdit, contact }: EditContactModalProps) => {
-  // Split initial phone number into country code and number
   const splitPhone = () => {
     const phone = contact.phone.trim()
     const match = phone.match(/^(\+\d{1,3})\s*(.*)$/)

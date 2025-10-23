@@ -23,10 +23,8 @@ const getStoredContacts = (): Contact[] => {
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
-  // Initialize contacts with stored data immediately
   const [contacts, setContacts] = useState<Contact[]>(getStoredContacts())
   
-  // Just handle loading state
   useEffect(() => {
     const simulateLoading = async () => {
       await new Promise(resolve => setTimeout(resolve, 500))
@@ -35,7 +33,6 @@ function App() {
     simulateLoading()
   }, [])
 
-  // Save contacts to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts))
   }, [contacts])
@@ -46,15 +43,11 @@ function App() {
   const [sortOrder, setSortOrder] = useState<'az' | 'za'>('az')
   const [deleteContact, setDeleteContact] = useState<Contact | null>(null)
 
-  // Helper function to normalize strings for comparison
   const normalizeString = (str: string) => {
-    // Remove spaces, convert to lowercase
     return str.replace(/\s+/g, '').toLowerCase()
   }
 
-  // Helper function to normalize phone numbers
   const normalizePhone = (phone: string) => {
-    // Remove spaces, dashes, parentheses, plus signs
     return phone.replace(/[\s\-()+ ]/g, '')
   }
 
@@ -69,7 +62,6 @@ function App() {
         case 'email':
           return normalizeString(contact.email).includes(normalizedQuery)
         case 'phone':
-          // For phone, remove common separators from both query and stored number
           return normalizePhone(contact.phone).includes(normalizePhone(searchQuery))
         default:
           return normalizeString(contact.name).includes(normalizedQuery)

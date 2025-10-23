@@ -28,5 +28,3 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     </ThemeContext.Provider>
   )
 }
-
-// useTheme moved to useTheme.tsx
