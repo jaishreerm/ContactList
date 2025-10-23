@@ -76,11 +76,11 @@ function App() {
     const dupPhone = contacts.find(c => c.phone.trim() === phone)
 
     if (dupName || dupEmail || dupPhone) {
-      const parts: string[] = []
-      if (dupName) parts.push('name')
-      if (dupEmail) parts.push('email')
-      if (dupPhone) parts.push('phone')
-      throw new Error(`Cannot add contact — the following fields must be unique and already exist: ${parts.join(', ')}`)
+      const duplicates = []
+      if (dupName) duplicates.push('Name')
+      if (dupEmail) duplicates.push('Email')
+      if (dupPhone) duplicates.push('Phone number')
+      throw new Error(`The following fields must be unique. ${duplicates.join(' and ')} already exist.`)
     }
 
     const contact: Contact = {
@@ -109,11 +109,11 @@ function App() {
     const dupPhone = contacts.find(c => c.id !== id && c.phone.trim() === phone)
 
     if (dupName || dupEmail || dupPhone) {
-      const parts: string[] = []
-      if (dupName) parts.push('name')
-      if (dupEmail) parts.push('email')
-      if (dupPhone) parts.push('phone')
-      throw new Error(`Cannot update contact — the following fields must be unique and already exist: ${parts.join(', ')}`)
+      const duplicates = []
+      if (dupName) duplicates.push('Name')
+      if (dupEmail) duplicates.push('Email')
+      if (dupPhone) duplicates.push('Phone number')
+      throw new Error(`The following fields must be unique. ${duplicates.join(' and ')} already exist.`)
     }
 
     const updatedContacts = contacts.map(contact => 
@@ -148,14 +148,14 @@ function App() {
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 sm:px-0">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center space-x-4">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0 mb-6">
+              <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h2>
-                <div className="relative">
+                <div className="relative w-full sm:w-auto">
                   <select
                     value={searchBy}
                     onChange={(e) => setSearchBy(e.target.value as 'name' | 'email' | 'phone')}
-                    className="appearance-none rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-3 pr-8 py-1.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="w-full sm:w-auto appearance-none rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-3 pr-8 py-1.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   >
                     <option value="name">Search by Name</option>
                     <option value="email">Search by Email</option>
@@ -164,15 +164,15 @@ function App() {
                   <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
                 </div>
               </div>
-              <div className="flex space-x-4">
+              <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:space-x-4">
                 <ThemeToggle />
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center w-full sm:w-auto">
                   <label htmlFor="sort" className="sr-only">Sort</label>
                   <select
                     id="sort"
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value as 'az' | 'za')}
-                    className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none"
+                    className="w-full sm:w-auto rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none"
                   >
                     <option value="az">A - Z</option>
                     <option value="za">Z - A</option>
@@ -180,13 +180,13 @@ function App() {
                 </div>
                 <button
                   onClick={() => setShowFavoritesOnly(prev => !prev)}
-                  className={`px-3 py-2 rounded-md border ${showFavoritesOnly ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200'} focus:outline-none`}
+                  className={`w-full sm:w-auto px-3 py-2 rounded-md border ${showFavoritesOnly ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200'} focus:outline-none`}
                 >
                   Favorites
                 </button>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                  className="w-full sm:w-auto bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                 >
                   Add Contact
                 </button>

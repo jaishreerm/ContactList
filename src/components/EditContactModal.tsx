@@ -11,17 +11,33 @@ interface EditContactModalProps {
 }
 
 const EditContactModal = ({ isOpen, onClose, onEdit, contact }: EditContactModalProps) => {
+  // Split initial phone number into country code and number
+  const splitPhone = () => {
+    const phone = contact.phone.trim()
+    const match = phone.match(/^(\+\d{1,3})\s*(.*)$/)
+    return {
+      countryCode: match ? match[1] : '+91',
+      phoneNumber: match ? match[2] : phone
+    }
+  }
+
   const [formData, setFormData] = useState({
     name: contact.name,
     email: contact.email,
-    phone: contact.phone,
+    ...splitPhone()
   })
   const [error, setError] = useState<string | null>(null)
+
+  const combinedPhone = `${formData.countryCode} ${formData.phoneNumber}`.trim()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      onEdit(contact.id, formData)
+      onEdit(contact.id, {
+        name: formData.name,
+        email: formData.email,
+        phone: combinedPhone
+      })
       setError(null)
       onClose()
     } catch (err) {
@@ -114,14 +130,36 @@ const EditContactModal = ({ isOpen, onClose, onEdit, contact }: EditContactModal
                         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                           Phone
                         </label>
-                        <input
-                          type="tel"
-                          id="phone"
-                          required
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400"
-                        />
+                        <div className="mt-1 flex gap-2">
+                          <input
+                            type="text"
+                            id="countryCode"
+                            required
+                            value={formData.countryCode}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              if (value === '' || value === '+' || /^\+\d{0,3}$/.test(value)) {
+                                setFormData({ ...formData, countryCode: value })
+                              }
+                            }}
+                            placeholder="+91"
+                            className="block w-20 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                          />
+                          <input
+                            type="tel"
+                            id="phoneNumber"
+                            required
+                            value={formData.phoneNumber}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              if (value === '' || /^\d+$/.test(value)) {
+                                setFormData({ ...formData, phoneNumber: value })
+                              }
+                            }}
+                            placeholder="Phone number"
+                            className="block flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                          />
+                        </div>
                       </div>
                     </div>
 
