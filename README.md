@@ -4,7 +4,7 @@ A modern, responsive contact management application built with React, TypeScript
 
 ## ✨ Live Demo
 
-[View Live Demo](https://contact-list-ishan03-25.vercel.app/)
+[View Live Demo](https://contact-list-chi-hazel.vercel.app/)
 
 ## 🎯 Key Features
 
