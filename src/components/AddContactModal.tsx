@@ -13,6 +13,7 @@ const AddContactModal = ({ isOpen, onClose, onAdd }: AddContactModalProps) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    country: '',
     countryCode: '+91',
     phoneNumber: '',
   })
@@ -28,7 +29,7 @@ const AddContactModal = ({ isOpen, onClose, onAdd }: AddContactModalProps) => {
         email: formData.email,
         phone: combinedPhone,
       })
-      setFormData({ name: '', email: '', countryCode: '+91', phoneNumber: '' })
+      setFormData({ name: '', email: '',country:'', countryCode: '+91', phoneNumber: '' })
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -116,6 +117,19 @@ const AddContactModal = ({ isOpen, onClose, onAdd }: AddContactModalProps) => {
                         />
                       </div>
 
+                    <div>
+                        <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Name
+                        </label>
+                        <input
+                          type="text"
+                          id="country"
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 shadow-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-400 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                        />
+                      </div>
                       <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                           Phone

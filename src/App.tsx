@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { type Contact } from './types/contact'
 import ContactList from './components/ContactList'
 import AddContactModal from './components/AddContactModal'
@@ -6,7 +6,8 @@ import DeleteConfirmationModal from './components/DeleteConfirmationModal'
 import SearchBar from './components/SearchBar'
 import ThemeToggle from './components/ThemeToggle'
 import { ThemeProvider } from './contexts/ThemeContext'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Menu, Transition } from '@headlessui/react'
+import { FunnelIcon } from '@heroicons/react/20/solid'
 import ContactSkeleton from './components/ContactSkeleton'
 import EmptyState from './components/EmptyState'
 import './App.css'
@@ -19,6 +20,11 @@ const getStoredContacts = (): Contact[] => {
     console.error('Error reading from localStorage:', error)
     return []
   }
+}
+
+// Helper function to conditionally join class names
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
 }
 
 function App() {
@@ -36,12 +42,20 @@ function App() {
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts))
   }, [contacts])
+  
   const [searchQuery, setSearchQuery] = useState('')
   const [searchBy, setSearchBy] = useState<'name' | 'email' | 'phone'>('name')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const [sortOrder, setSortOrder] = useState<'az' | 'za'>('az')
   const [deleteContact, setDeleteContact] = useState<Contact | null>(null)
+
+  // Labels for the placeholder
+  const searchByLabel = {
+    name: 'Name',
+    email: 'Email',
+    phone: 'Phone',
+  }
 
   const normalizeString = (str: string) => {
     return str.replace(/\s+/g, '').toLowerCase()
@@ -121,7 +135,7 @@ function App() {
       if (dupName) duplicates.push('Name')
       if (dupEmail) duplicates.push('Email')
       if (dupPhone) duplicates.push('Phone number')
-      throw new Error(`The following fields must be unique. ${duplicates.join(' and ')} already exist.`)
+      throw new Error(`The following fields must be unique. ${duplicates.join(' and ')} already exist.`);
     }
 
     const updatedContacts = contacts.map(contact => 
@@ -159,18 +173,76 @@ function App() {
             <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0 mb-6">
               <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Contacts</h2>
-                <div className="relative w-full sm:w-auto">
-                  <select
-                    value={searchBy}
-                    onChange={(e) => setSearchBy(e.target.value as 'name' | 'email' | 'phone')}
-                    className="w-full sm:w-auto appearance-none rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-3 pr-8 py-1.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                
+                {/* Filter Icon Dropdown */}
+                <Menu as="div" className="relative inline-block text-left">
+                  <div>
+                    <Menu.Button className="inline-flex justify-center items-center w-full sm:w-auto rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                      <FunnelIcon className="h-5 w-5" aria-hidden="true" />
+                      <span className="sr-only">Filter options</span>
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
                   >
-                    <option value="name">Search by Name</option>
-                    <option value="email">Search by Email</option>
-                    <option value="phone">Search by Phone</option>
-                  </select>
-                  <ChevronDownIcon className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 pointer-events-none" />
-                </div>
+                    <Menu.Items className="absolute left-0 sm:left-auto sm:right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-gray-700 focus:outline-none">
+                      <div className="py-1">
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              type="button"
+                              onClick={() => setSearchBy('name')}
+                              className={classNames(
+                                active ? 'bg-gray-100 dark:bg-gray-700' : '',
+                                searchBy === 'name' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300',
+                                'block w-full text-left px-4 py-2 text-sm'
+                              )}
+                            >
+                              Search by Name
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              type="button"
+                              onClick={() => setSearchBy('email')}
+                              className={classNames(
+                                active ? 'bg-gray-100 dark:bg-gray-700' : '',
+                                searchBy === 'email' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300',
+                                'block w-full text-left px-4 py-2 text-sm'
+                              )}
+                            >
+                              Search by Email
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              type="button"
+                              onClick={() => setSearchBy('phone')}
+                              className={classNames(
+                                active ? 'bg-gray-100 dark:bg-gray-700' : '',
+                                searchBy === 'phone' ? 'font-semibold text-indigo-600 dark:text-indigo-400' : 'text-gray-700 dark:text-gray-300',
+                                'block w-full text-left px-4 py-2 text-sm'
+                              )}
+                            >
+                              Search by Phone
+                            </button>
+                          )}
+                        </Menu.Item>
+                      </div>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+
               </div>
               <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:space-x-4">
                 <ThemeToggle />
@@ -180,7 +252,7 @@ function App() {
                     id="sort"
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value as 'az' | 'za')}
-                    className="w-full sm:w-auto rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none"
+                    className="w-full sm:w-auto rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 py-1.5 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   >
                     <option value="az">A - Z</option>
                     <option value="za">Z - A</option>
@@ -188,23 +260,26 @@ function App() {
                 </div>
                 <button
                   onClick={() => setShowFavoritesOnly(prev => !prev)}
-                  className={`w-full sm:w-auto px-3 py-2 rounded-md border ${showFavoritesOnly ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200'} focus:outline-none`}
+                  className={`w-full sm:w-auto px-3 py-2 rounded-md border text-sm ${showFavoritesOnly
+                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600'
+                    } focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400`}
                 >
                   Favorites
                 </button>
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="w-full sm:w-auto bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+                  className="w-full sm:w-auto bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 text-sm font-medium"
                 >
                   Add Contact
                 </button>
               </div>
             </div>
 
-            <SearchBar 
-              value={searchQuery} 
+            <SearchBar
+              value={searchQuery}
               onChange={setSearchQuery}
-              placeholder={`Search by ${searchBy}...`}
+              placeholder={`Search by ${searchByLabel[searchBy]}...`}
             />
 
             <div className="mt-6">
@@ -234,7 +309,7 @@ function App() {
               ) : (
                 <EmptyState
                   title="Your contact list is empty"
-                  message="Click '+ Add Contact' to get started!"
+                  message="Click 'Add Contact' to get started!"
                 />
               )}
             </div>
