@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Contact List Application
 
 A modern, responsive contact management application built with React, TypeScript, and Tailwind CSS. This project demonstrates advanced frontend development practices, state management, and exceptional user experience.
@@ -109,3 +110,6 @@ src/
 - [ ] Cloud sync and backup functionality
 - [ ] Contact import/export capabilities
 - [ ] Rich contact details with notes and custom fields
+=======
+# ContactList
+>>>>>>> ed0b0e3d6d906af1bd6ea1e476f878409bdef0e5
